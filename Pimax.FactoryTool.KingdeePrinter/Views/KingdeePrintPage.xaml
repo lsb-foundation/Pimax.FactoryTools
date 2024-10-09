@@ -1,0 +1,84 @@
+﻿<Page x:Class="Pimax.FactoryTool.KingdeePrinter.Views.KingdeePrintPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:vm="clr-namespace:Pimax.FactoryTool.KingdeePrinter.ViewModels"
+      xmlns:hp="clr-namespace:Pimax.FactoryTool.KingdeePrinter.Helpers"
+      mc:Ignorable="d"
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="KingdeePrintPage">
+    
+    <Page.DataContext>
+        <vm:KingdeePrintPageViewModel/>
+    </Page.DataContext>
+
+    <Page.Resources>
+        <hp:TrimConverter x:Key="TrimConverter"/>
+        <hp:BooleanYesOrNoConverter x:Key="BooleanYesOrNoConverter"/>
+    </Page.Resources>
+    
+    <Grid Margin="4">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Vertical" Margin="0,4,0,0">
+            <StackPanel.Resources>
+                <Style TargetType="Label">
+                    <Setter Property="Width" Value="80"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                </Style>
+                <Style TargetType="TextBox">
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="InputMethod.IsInputMethodEnabled" Value="False"/>
+                </Style>
+            </StackPanel.Resources>
+            <StackPanel Orientation="Horizontal">
+                <Label>产品料号</Label>
+                <ComboBox Width="200" VerticalContentAlignment="Center"
+                          ItemsSource="{Binding LabelList}" 
+                          DisplayMemberPath="ProductCode" IsEnabled="{Binding IsReady}"
+                          SelectedItem="{Binding SelectedLabel}"/>
+                <Label>订单号</Label>
+                <TextBox Width="200" IsEnabled="{Binding IsReady}" Text="{Binding OrderNumber, Converter={StaticResource TrimConverter}, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                <Label>整机SN</Label>
+                <TextBox x:Name="SerialNumberTextBox" Width="200" IsEnabled="{Binding IsReady}"
+                         Text="{Binding SerialNumber, Converter={StaticResource TrimConverter}, UpdateSourceTrigger=PropertyChanged}"/>
+                <Label>金蝶KN</Label>
+                <TextBox Width="200" IsEnabled="False" Text="{Binding KingdeeNumber, Converter={StaticResource TrimConverter}, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Width="100" Margin="16,0,0,0"
+                        IsEnabled="{Binding CanPrint}"
+                        Command="{Binding AttachPrintCommand}">打印</Button>
+            </StackPanel>
+        </StackPanel>
+
+        <ListView Grid.Row="1" Margin="0,8,0,0" AlternationCount="2"
+                  ItemsSource="{Binding OperationLogs}" Foreground="Black">
+            <ListView.View>
+                <GridView>
+                    <GridView.Columns>
+                        <GridViewColumn Header="整机SN" Width="180" DisplayMemberBinding="{Binding Binding.SerialNumber}"/>
+                        <GridViewColumn Header="金蝶KN" Width="180" DisplayMemberBinding="{Binding Binding.BindingNumber}"/>
+                        <GridViewColumn Header="产品料号" Width="100" DisplayMemberBinding="{Binding Info.ProductCode}"/>
+                        <GridViewColumn Header="订单号" Width="100" DisplayMemberBinding="{Binding Info.OrderCode}"/>
+                        <!--<GridViewColumn Header="是否上传白名单" Width="120" DisplayMemberBinding="{Binding Info.IsAddToWhiteList, Converter={StaticResource BooleanYesOrNoConverter}}"/>-->
+                        <GridViewColumn Header="操作时间" Width="150" DisplayMemberBinding="{Binding Binding.OperationTime, StringFormat={}{0 :yyyy/MM/dd HH:mm:ss}}"/>
+                    </GridView.Columns>
+                </GridView>
+            </ListView.View>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Style.Triggers>
+                        <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                            <Setter Property="Background" Value="#eeeeee"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+    </Grid>
+</Page>
